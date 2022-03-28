@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, TextInput, TouchableWithoutFeedback } from 'rea
 import { Accelerometer } from 'expo-sensors';
 import AppButton from './app/components/AppButton';
 import Screen from './app/components/Screen';
-import apiClient from './app/api/client';
 import AppTextInput from './app/components/AppTextInput';
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { create } from 'apisauce';
@@ -12,7 +11,7 @@ import { Keyboard } from 'react-native';
 export default function App() {
   const [text, setText] = useState('Hello Micha');
   const [counter, setCounter] = useState(0);
-  const [userUrl, setUserUrl] = useState('http://192.168.0.6:4001/api');
+  const [userUrl, setUserUrl] = useState('http://192.168.0.6:4001/api/post');
   const [httpStatus, setHttpStatus] = useState(null);
 
 
@@ -22,7 +21,7 @@ export default function App() {
 
   const handelButtonPress = () => {
     console.log("POST...");
-    apiClient.post("/post", { "key": text })
+    apiClient.post("/", { "key": text })
       .then(
         response => setHttpStatus(response.status)
       )
@@ -45,6 +44,7 @@ export default function App() {
       removeListener();
     };
   });
+
 
   const addSensorListener = (handler) => {
     //this is shake sensitivity - lowering this will give high sensitivity and increasing this will give lower sensitivity
@@ -100,9 +100,6 @@ export default function App() {
               onChangeText={setUserUrl}
               placeholder={userUrl}
             />
-            {/* <Text style={styles.text}>
-              {userUrl}
-            </Text> */}
             <AppButton color="primary" title="Manual Event" onPress={handelButtonPress} />
           </View>
 
@@ -129,12 +126,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   text: {
-    // flex: 1,
     fontSize: 20,
     textAlign: 'center'
   },
   label: {
-    // flex: 1,
     fontSize: 20,
     textAlign: 'left'
   }
