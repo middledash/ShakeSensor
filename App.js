@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableWithoutFeedback } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
 import AppButton from './app/components/AppButton';
 import Screen from './app/components/Screen';
@@ -11,20 +11,31 @@ import { Keyboard } from 'react-native';
 export default function App() {
   const [text, setText] = useState('Hello Micha');
   const [counter, setCounter] = useState(0);
-  const [userUrl, setUserUrl] = useState('http://192.168.0.6:4001/api/post');
+  // const [userUrl, setUserUrl] = useState('http://192.168.0.6:4001/api/post');
+  const [userUrl, setUserUrl] = useState('http://44.192.67.50:8001');
   const [httpStatus, setHttpStatus] = useState(null);
-
+  const [preventPost, setPreventPost] = useState(false);
 
   const apiClient = create({
     baseURL: userUrl
   })
 
+  const myDelay = () => {
+    console.log("Delay..");
+    setPreventPost(false);
+  }
+
   const handelButtonPress = () => {
+    if (preventPost) return;
+
     console.log("POST...");
-    apiClient.post("/", { "key": text })
+    // apiClient.post("/", { "key": text })
+    apiClient.post("/", { "key": parseInt(text, 10) })
       .then(
         response => setHttpStatus(response.status)
       )
+    setPreventPost(true);
+    setTimeout(() => { myDelay() }, 4000);
   }
 
   const handleTextChange = (e) => {
@@ -76,6 +87,7 @@ export default function App() {
   return (
     <Screen style={styles.container}>
       <View style={styles.background}>
+
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss() }}>
           <View style={styles.button}>
             <Text style={styles.text}>
@@ -85,22 +97,28 @@ export default function App() {
                 <MaterialCommunityIcons name="check-circle" size={50} color="lightgrey" />}
             </Text>
             <Text style={styles.label}>
-              Your Message:
+              Number:
             </Text>
             <AppTextInput
               style={styles.input}
               onChangeText={handleTextChange}
-              placeholder="Enter some text..."
+              placeholder="20"
             />
             <Text style={styles.label}>
-              http-Endpoint:
+              HTTP:
             </Text>
             <AppTextInput
               style={styles.input}
               onChangeText={setUserUrl}
               placeholder={userUrl}
             />
-            <AppButton color="primary" title="Manual Event" onPress={handelButtonPress} />
+            <AppButton color="secondary" title="Manual Event" onPress={handelButtonPress} />
+            <View style={styles.logo}>
+              <Image
+                style={styles.tinyLogo}
+                source={require('./assets/LogoWeeve.png')}
+              />
+            </View>
           </View>
 
         </TouchableWithoutFeedback>
@@ -113,10 +131,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // justifyContent: 'center',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignContent: 'center',
   },
   background: {
-    height: '100%',
+    // height: '100%',
     // justifyContent: 'center',
   },
   button: {
@@ -132,5 +152,16 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 20,
     textAlign: 'left'
-  }
+  },
+  logo: {
+    alignItems: 'center',
+    margin: 20,
+    height: 200,
+  },
+  tinyLogo: {
+    width: 150,
+    height: 150,
+    margin: 10,
+    resizeMode: 'contain',
+  },
 });
